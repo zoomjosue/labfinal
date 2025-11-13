@@ -7,8 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +21,7 @@ import com.example.labfinal.ui.components.ErrorScreen
 import com.example.labfinal.ui.components.LoadingScreen
 import java.text.NumberFormat
 import java.util.Locale
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,14 +30,30 @@ fun AssetsScreen(
     viewModel: AssetsViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Criptomonedas") },
                 actions = {
-                    IconButton(onClick = { viewModel.saveOfflineData() }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Ver offline")
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                viewModel.saveOfflineData()
+                                snackbarHostState.showSnackbar(
+                                    message = "Datos guardados para ver offline",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Refresh,
+                            contentDescription = "Guardar para ver offline"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -60,7 +76,10 @@ fun AssetsScreen(
             }
             else -> {
                 Column(modifier = Modifier.padding(padding)) {
-                    DataSourceIndicator(dataSource = uiState.dataSource)
+                    DataSourceIndicator(
+                        dataSource = uiState.dataSource,
+                        timestamp = uiState.lastUpdate
+                    )
                     LazyColumn {
                         items(uiState.data) { asset ->
                             AssetListItem(asset = asset, onClick = onAssetClick)
@@ -73,10 +92,17 @@ fun AssetsScreen(
 }
 
 @Composable
-fun DataSourceIndicator(dataSource: DataSource) {
+fun DataSourceIndicator(dataSource: DataSource, timestamp: Long?) {
     val text = when (dataSource) {
         DataSource.NETWORK -> "Viendo data más reciente"
-        DataSource.LOCAL -> "Viendo data del ${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(System.currentTimeMillis())}"
+        DataSource.LOCAL -> {
+            if (timestamp != null) {
+                val dateFormat = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                "Viendo data del ${dateFormat.format(timestamp)}"
+            } else {
+                "Viendo data guardada"
+            }
+        }
         DataSource.UNKNOWN -> ""
     }
 

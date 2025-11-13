@@ -1,6 +1,7 @@
 package com.example.labfinal.data.network
 
 import com.example.labfinal.data.network.dto.AssetResponseDto
+import com.example.labfinal.data.network.dto.SingleAssetResponseDto
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
@@ -11,7 +12,7 @@ class CoinCapApiService {
         return client.get("assets").body()
     }
 
-    suspend fun getAssetById(id: String): AssetResponseDto {
+    suspend fun getAssetById(id: String): SingleAssetResponseDto {
         return client.get("assets/$id").body()
     }
 }

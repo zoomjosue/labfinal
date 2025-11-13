@@ -30,8 +30,8 @@ object KtorClient {
         }
 
         defaultRequest {
-            url("https://api.coincap.io/v3/")
-            headers.append("Authorization", "Bearer 6f8c2f757cc8f09ea8ecd958da5029e0aeed53114ebc731147d3197f3a580b1a")
+            url("https://api.coincap.io/v2/")
+            headers.append("Authorization", "Bearer 6f8c2f757cc81e9950a05aeed8292abff853114ebc731977f3f5a580b1e9371a")
         }
     }
 }

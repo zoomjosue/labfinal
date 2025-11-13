@@ -6,7 +6,8 @@ data class AssetsUiState(
     val isLoading: Boolean = false,
     val data: List<Asset> = emptyList(),
     val hasError: Boolean = false,
-    val dataSource: DataSource = DataSource.UNKNOWN
+    val dataSource: DataSource = DataSource.UNKNOWN,
+    val lastUpdate: Long? = null
 )
 
 enum class DataSource {

@@ -8,6 +8,13 @@ data class AssetResponseDto(
     val timestamp: Long
 )
 
+// Para un solo asset (/assets/{id})
+@Serializable
+data class SingleAssetResponseDto(
+    val data: AssetDto,
+    val timestamp: Long
+)
+
 @Serializable
 data class AssetDto(
     val id: String,
